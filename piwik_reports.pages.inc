@@ -58,6 +58,34 @@ function piwik_reports_dateselect_form() {
   return $form;
 }
 
+function piwik_reports_segmentselect_form() {
+
+  $segments = piwik_reports_get_segments();
+
+  $form['#attributes'] = array('class' => array('search-form'));
+  $form['basic'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Select a regional segment'),
+  );
+  $form['basic']['inline'] = array(
+    '#prefix' => '<div class="container-inline">',
+    '#suffix' => '</div>',
+  );
+  $form['basic']['inline']['segment'] = array(
+    '#type' => 'select',
+    '#title' => '',
+    '#default_value' => isset($_SESSION['piwik_reports_segment']) ?
+      $_SESSION['piwik_reports_segment'] : 0,
+    '#options' => $segments,
+  );
+  $form['basic']['inline']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Filter'),
+    '#weight' => 15,
+  );
+  return $form;
+}
+
 /**
  * Return the form where to select the site.
  */
@@ -122,6 +150,8 @@ function piwik_reports_reports($form, &$form_state, $report) {
     return;
   }
   $form = piwik_reports_dateselect_form();
+  $segform = piwik_reports_segmentselect_form();
+  $form['basic']['inline']['segment'] = $segform['basic']['inline']['segment'];
   $form = piwik_reports_siteselect_form($form, $sites);
   $piwik_site_id = $_SESSION['piwik_reports_site'];
   $period = isset($_SESSION['piwik_reports_period']) ? $_SESSION['piwik_reports_period'] : 0;
@@ -134,6 +164,8 @@ function piwik_reports_reports($form, &$form_state, $report) {
       $dim_id = FALSE;
       break;
   }
+
+  $segment = isset($_SESSION['piwik_reports_segment']) ? $_SESSION['piwik_reports_segment'] : 0;
 
   if ($period == 1) {
     // Special handling for "yesterday" = 1.
@@ -158,6 +190,8 @@ function piwik_reports_reports($form, &$form_state, $report) {
   $data_params[0]['action'] = 'iframe';
   $data_params[0]['disableLink'] = 1;
   $data_params[0]['widget'] = 1;
+
+  if ($segment != 'None') $data_params[0]['segment'] = "regionCode==$segment";
  // $data_params[0]['loading'] = t('Loading data...');
   if (!empty($piwik_auth)) {
     $data_params[0]['token_auth'] = $piwik_auth;
@@ -246,7 +280,7 @@ function piwik_reports_reports($form, &$form_state, $report) {
       $data_params[0]['moduleToWidgetize'] = 'CustomDimensions';
       $data_params[0]['actionToWidgetize'] = 'getCustomDimension';
       $data_params[0]['idDimension'] = $dim_id;
-      $data_params[0]['filter_limit'] = 15;
+      $data_params[0]['filter_limit'] = 50;
       break;
     case 'referers_evolution':
       $title[0] = '';
@@ -310,6 +344,7 @@ function piwik_reports_reports($form, &$form_state, $report) {
  * Reports form submit function
  */
 function piwik_reports_reports_submit($form, &$form_state) {
+  $_SESSION['piwik_reports_segment'] = $form_state['values']['segment'];
   $_SESSION['piwik_reports_period'] = $form_state['values']['period'];
   $_SESSION['piwik_reports_site'] = $form_state['values']['site'];
 }
