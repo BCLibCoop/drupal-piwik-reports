@@ -31,6 +31,8 @@ function piwik_reports_dateselect_form() {
     2 => t('Last week'),
     3 => t('Last month'),
     4 => t('Last year'),
+    5 => t('From beginning'),
+    6 => t('Last quarter')
   );
 
   $form['#attributes'] = array('class' => array('search-form'));
@@ -138,6 +140,8 @@ function piwik_reports_reports($form, &$form_state, $report) {
     // The yesterday date value is required.
     $date = _piwik_reports_select_period($period);
   }
+  //Custom periods
+  elseif ($period >= 5) $date = _piwik_reports_select_period($period);
   else {
     // Otherwise it returns the today date value.
     $date = _piwik_reports_select_period(0);
@@ -344,6 +348,24 @@ function _piwik_reports_select_period($period) {
       $d = mktime(0, 0, 0, date("m"), date("d"), date("Y") - 1);
       $date = date("Y-m-d", $d);
       break;
+
+    case 5: //Range launch through today
+      $launch = date("Y-m-d", 1430438400);
+      $today = date("Y-m-d");
+      $date = $launch . ',' . $today;
+      break;
+
+    case 6:
+      $curMonth = date("m", time());
+      $year = date("Y", time());
+      $lastMonth = $curMonth-1;
+      if($lastMonth == '12') $year = $year -1; //if last month was December,
+      // bump year back
+      $lastQstartMonth = ($lastMonth - 3) + 1;
+      $lastQstartDate = date("Y-m-d", strtotime("$year".'-'."$lastQstartMonth"
+        .'-'.'01'));
+      $lastQendDate = date("Y-m-t", strtotime("$year".'-'."$lastMonth"));
+      $date = $lastQstartDate . ',' . $lastQendDate;
   }
   return $date;
 }
