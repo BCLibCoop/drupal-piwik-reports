@@ -124,6 +124,15 @@ function piwik_reports_reports($form, &$form_state, $report) {
   $piwik_site_id = $_SESSION['piwik_reports_site'];
   $period = isset($_SESSION['piwik_reports_period']) ? $_SESSION['piwik_reports_period'] : 0;
 
+  switch($piwik_site_id) {
+    case 61:
+      $dim_id = 1;
+      break;
+    default:
+      $dim_id = FALSE;
+      break;
+  }
+
   if ($period == 1) {
     // Special handling for "yesterday" = 1.
     // The yesterday date value is required.
@@ -228,6 +237,13 @@ function piwik_reports_reports($form, &$form_state, $report) {
       $data_params[0]['actionToWidgetize'] = 'getDownloads';
       $data_params[0]['filter_limit'] = 15;
     break;
+    case 'actions_by_path':
+      $title[0] = '';
+      $data_params[0]['moduleToWidgetize'] = 'CustomDimensions';
+      $data_params[0]['actionToWidgetize'] = 'getCustomDimension';
+      $data_params[0]['idDimension'] = $dim_id;
+      $data_params[0]['filter_limit'] = 15;
+      break;
     case 'referers_evolution':
       $title[0] = '';
       $data_params[0]['moduleToWidgetize'] = 'Referers';
@@ -361,6 +377,11 @@ function _piwik_reports_get_period_name($period) {
 
     case 4:
       $p = "year";
+      break;
+
+    case 5:
+    case 6:
+      $p = "range";
       break;
   }
   return $p;
