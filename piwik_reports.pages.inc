@@ -38,7 +38,7 @@ function piwik_reports_dateselect_form() {
   $form['#attributes'] = array('class' => array('search-form'));
   $form['basic'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Select site and time period'),
+    '#title' => t('Select site, time period and regional segment'),
   );
   $form['basic']['inline'] = array(
     '#prefix' => '<div class="container-inline">',
