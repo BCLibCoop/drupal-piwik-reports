@@ -395,11 +395,11 @@ function _piwik_reports_select_period($period) {
       break;
 
     case 6:
-      $curMonth = date("m", time());
-      $year = date("Y", time());
-      $lastMonth = $curMonth-1;
-      if($lastMonth == '12') $year = $year -1; //if last month was December,gi
-      // bump year back
+      $curMonth = (int) date("m", time());
+      $year = (int) date("Y", time());
+      $lastMonth = $curMonth == 1 ? 12 : $curMonth - 1;
+      $year = $lastMonth == 12 ? $year - 1 : $year; //if last month was
+      // December, bump year back
       $lastQstartMonth = ($lastMonth - 3) + 1;
       $lastQstartDate = date("Y-m-d", strtotime("$year".'-'."$lastQstartMonth"
         .'-'.'01'));
