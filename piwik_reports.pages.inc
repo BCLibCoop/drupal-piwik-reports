@@ -191,7 +191,6 @@ function piwik_reports_reports($form, &$form_state, $report) {
   $data_params[0]['disableLink'] = 1;
   $data_params[0]['widget'] = 1;
 
-  if ($segment != 'None') $data_params[0]['segment'] = "regionCode==$segment";
  // $data_params[0]['loading'] = t('Loading data...');
   if (!empty($piwik_auth)) {
     $data_params[0]['token_auth'] = $piwik_auth;
@@ -281,6 +280,7 @@ function piwik_reports_reports($form, &$form_state, $report) {
       $data_params[0]['actionToWidgetize'] = 'getCustomDimension';
       $data_params[0]['idDimension'] = $dim_id;
       $data_params[0]['filter_limit'] = 50;
+      $data_params[0]['segment'] .= "actionType!=pageviews,actionType!=sitesearches,actionType!=contents,";
       break;
     case 'referers_evolution':
       $title[0] = '';
@@ -323,6 +323,10 @@ function piwik_reports_reports($form, &$form_state, $report) {
       }
     break;
   }
+
+  //Finally add given segments - should append if key exists
+  if ($segment != 'None') $data_params[0]['segment'] .= "regionCode==$segment";
+
   // Build the data URL with all params and urlencode it.
   foreach ($data_params as $key => $data) {
     $theme_args['data_url'][] = array('url' => $piwik_url . 'index.php?' . drupal_http_build_query($data), 
@@ -394,7 +398,7 @@ function _piwik_reports_select_period($period) {
       $curMonth = date("m", time());
       $year = date("Y", time());
       $lastMonth = $curMonth-1;
-      if($lastMonth == '12') $year = $year -1; //if last month was December,
+      if($lastMonth == '12') $year = $year -1; //if last month was December,gi
       // bump year back
       $lastQstartMonth = ($lastMonth - 3) + 1;
       $lastQstartDate = date("Y-m-d", strtotime("$year".'-'."$lastQstartMonth"
