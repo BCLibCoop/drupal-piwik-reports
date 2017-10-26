@@ -280,7 +280,7 @@ function piwik_reports_reports($form, &$form_state, $report) {
       $data_params[0]['actionToWidgetize'] = 'getCustomDimension';
       $data_params[0]['idDimension'] = $dim_id;
       $data_params[0]['filter_limit'] = 50;
-      $data_params[0]['segment'] .= "actionType!=pageviews,actionType!=sitesearches,actionType!=contents,";
+      $data_params[0]['segment'] .= "actionType!=pageviews,actionType!=sitesearches,actionType!=contents";
       break;
     case 'referers_evolution':
       $title[0] = '';
@@ -324,8 +324,12 @@ function piwik_reports_reports($form, &$form_state, $report) {
     break;
   }
 
+
   //Finally add given segments - should append if key exists
-  if ($segment != 'None') $data_params[0]['segment'] .= "regionCode==$segment";
+  if ($segment != 'None') {
+    if (isset($data_params[0]['segment'])) $data_params[0]['segment'] .= ',';
+    $data_params[0]['segment'] .= "regionCode==$segment";
+  }
 
   // Build the data URL with all params and urlencode it.
   foreach ($data_params as $key => $data) {
